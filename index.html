@@ -250,7 +250,7 @@ if(!window.claude&&FB_URL){let cfgAt=0,known=false;try{
 }catch(e){}
 /* 他の端末で「保存して公開」されたら、開いている画面も自動で更新する */
 try{const es=new EventSource(FB_URL.replace(/\/+$/,"")+"/config.json");
-  es.addEventListener("put",e=>{try{const m=JSON.parse(e.data);if(m.path!=="/")return;const at=(m.data&&m.data.at)||0;if(at===cfgAt)return;if(known)location.reload();else{cfgAt=at;known=true}}catch(x){}})}catch(e){}}
+  es.addEventListener("put",e=>{try{const m=JSON.parse(e.data);if(m.path!=="/")return;const at=(m.data&&m.data.at)||0;if(at===cfgAt)return;cfgAt=at;let c=null;try{c=m.data&&m.data.json?JSON.parse(m.data.json):null}catch(x){}if(c&&c.date&&Array.isArray(c.timeline))cfg=c;else if(!m.data)cfg=JSON.parse($("cfg").textContent);else return;refresh()}catch(x){}})}catch(e){}}
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const p2=n=>String(n).padStart(2,"0");
@@ -258,16 +258,6 @@ const spans=s=>[...s].map((c,i)=>`<span style="--i:${i}">${c}</span>`).join("");
 
 /* date (JST, read straight from the string) */
 const W=["日","月","火","水","木","金","土"],E=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-const [Y,M,D,H,MI]=cfg.date.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/).slice(1).map(Number);
-const dw=new Date(Date.UTC(Y,M-1,D)).getUTCDay(),st=`${p2(H)}:${p2(MI)}`;
-const dot=`${Y}.${p2(M)}.${p2(D)}`;
-$("gd").textContent=`${Y}年${M}月${D}日（${W[dw]}）${st}〜`;
-$("td").textContent=`${dot} ${E[dw]}`;
-$("gt").innerHTML=spans("打ち上げ");const MG=typeof cfg.mega==="string"&&cfg.mega.trim()?cfg.mega.trim():"Wrap Party";$("mega").innerHTML=spans(MG.replace(/[ 　]/g,"\u00a0"));$("mega").setAttribute("aria-label",MG);
-$("mq").innerHTML=`<span>Kirieisai After Party</span><span>${dot}</span>`.repeat(10);
-const rows=[["日時",`${M}月${D}日（${W[dw]}）${st}〜${cfg.end}`],...cfg.info];
-$("info").innerHTML=rows.map(([k,v])=>`<div class="row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
-
 /* timeline */
 const tl=$("tl");
 function viewer(list,i){
@@ -290,21 +280,45 @@ if(PH.length){
   $("galg").querySelectorAll(".gi").forEach((b,i)=>{b.style.transitionDelay=(i%3)*.1+"s";b.onclick=()=>viewer(PH,i)});
 }
 function lightbox(src){viewer([src],0)}
-cfg.timeline.forEach(([tm,ti,d,ph])=>{
-  ph=ph||[];
-  const w=document.createElement("div");w.className="item";
-  const imgs=ph.map(s=>`<img src="${esc(s)}" alt="${esc(ti)}の写真" loading="lazy">`).join("");
-  w.innerHTML=`<button class="ev" aria-expanded="false"><time>${esc(tm)}</time><strong>${esc(ti)}${ph.length?' <em class="pc">Photo</em>':""}</strong><div class="more"><span>${esc(d)}${imgs?`<span class="ph">${imgs}</span>`:""}</span></div></button>`;
-  const b=w.firstChild;
-  b.onclick=e=>{
-    if(e.target.tagName==="IMG"){lightbox(e.target.src);return}
-    const o=b.getAttribute("aria-expanded")==="true";b.setAttribute("aria-expanded",!o);
-    if(!o){const r=b.getBoundingClientRect();/花火/.test(ti)?show(r.left+r.width/2,r.top+60,6):spark(r.right-40,r.top+40,26)}
-  };
-  tl.appendChild(w);
-});
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("on")}),{threshold:.4});
-document.querySelectorAll(".item,.row,h2,.gi").forEach(e=>io.observe(e));
+/* 内容の描画：公開された設定が変わったときも、ここを呼び直して画面をそのまま更新する */
+function render(){
+  const [Y,M,D,H,MI]=cfg.date.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/).slice(1).map(Number);
+  const dw=new Date(Date.UTC(Y,M-1,D)).getUTCDay(),st=`${p2(H)}:${p2(MI)}`;
+  const dot=`${Y}.${p2(M)}.${p2(D)}`;
+  if($("gd"))$("gd").textContent=`${Y}年${M}月${D}日（${W[dw]}）${st}〜`;
+  $("td").textContent=`${dot} ${E[dw]}`;
+  if($("gt")&&!$("gt").childNodes.length)$("gt").innerHTML=spans("打ち上げ");
+  const MG=typeof cfg.mega==="string"&&cfg.mega.trim()?cfg.mega.trim():"Wrap Party";
+  if($("mega").dataset.t!==MG){$("mega").dataset.t=MG;$("mega").innerHTML=spans(MG.replace(/[ 　]/g,"\u00a0"));$("mega").setAttribute("aria-label",MG)}
+  $("mq").innerHTML=`<span>Kirieisai After Party</span><span>${dot}</span>`.repeat(10);
+  const rows=[["日時",`${M}月${D}日（${W[dw]}）${st}〜${cfg.end}`],...cfg.info];
+  $("info").innerHTML=rows.map(([k,v])=>`<div class="row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+  const PH=cfg.photos||[];
+  if(PH.length){
+    $("gal").hidden=false;
+    $("galg").innerHTML=PH.map((s,i)=>`<button class="gi" data-i="${i}" aria-label="軽食の写真${i+1}を拡大"><img src="${esc(s)}" alt="軽食の写真 ${i+1}" loading="lazy"></button>`).join("");
+    $("galg").querySelectorAll(".gi").forEach((b,i)=>{b.style.transitionDelay=(i%3)*.1+"s";b.onclick=()=>viewer(PH,i)});
+  }else{$("gal").hidden=true;$("galg").innerHTML=""}
+  tl.querySelectorAll(".item").forEach(n=>{io.unobserve(n);n.remove()});
+  cfg.timeline.forEach(([tm,ti,d,ph])=>{
+    ph=ph||[];
+    const w=document.createElement("div");w.className="item";
+    const imgs=ph.map(s=>`<img src="${esc(s)}" alt="${esc(ti)}の写真" loading="lazy">`).join("");
+    w.innerHTML=`<button class="ev" aria-expanded="false"><time>${esc(tm)}</time><strong>${esc(ti)}${ph.length?' <em class="pc">Photo</em>':""}</strong><div class="more"><span>${esc(d)}${imgs?`<span class="ph">${imgs}</span>`:""}</span></div></button>`;
+    const b=w.firstChild;
+    b.onclick=e=>{
+      if(e.target.tagName==="IMG"){lightbox(e.target.src);return}
+      const o=b.getAttribute("aria-expanded")==="true";b.setAttribute("aria-expanded",!o);
+      if(!o){const r=b.getBoundingClientRect();/花火/.test(ti)?show(r.left+r.width/2,r.top+60,6):spark(r.right-40,r.top+40,26)}
+    };
+    tl.appendChild(w);
+  });
+  document.querySelectorAll(".item,.row,h2,.gi").forEach(e=>io.observe(e));
+  prog();
+}
+render();
+function refresh(){syncMembers();render();tick();if(onRoster)onRoster()}
 function prog(){const r=tl.getBoundingClientRect();tl.style.setProperty("--p",Math.min(1,Math.max(0,(innerHeight*.65-r.top)/r.height))*100+"%")}
 addEventListener("scroll",prog,{passive:true});prog();
 
@@ -372,6 +386,17 @@ const VARI={"邉":"辺","邊":"辺","髙":"高","澤":"沢","條":"条","榮":"�
 const norm=s=>String(s).normalize("NFKC").normalize("NFD").replace(/[\u3099\u309a]/g,"").normalize("NFC").toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96)).replace(/[^\u3041-\u309f\u30fca-z0-9\u3400-\u9fff]/g,"").replace(/[邉邊髙澤條榮齋齊德國濱嶋]/g,c=>VARI[c]);
 const HON=/(さん|くん|ちゃん|様|さま|氏|君|先輩|せんぱい)$/;
 ROSTER.forEach(m=>{const[f,g,fk,gk]=m._k.map(norm);m.keys=[f+g,g+f,fk+gk,gk+fk,f,g,fk,gk];delete m._k});
+/* 追加メンバー（編集画面から追加 → cfg.members）を名簿に加える */
+let onRoster=null;
+const ROSTER_N=ROSTER.length;
+function syncMembers(){
+  ROSTER.length=ROSTER_N;
+  (cfg.members||[]).forEach(a=>{const[id,g,role,f,gv,fk,gk]=a;
+    const m={id,g,role,name:f+" "+gv,kana:fk+" "+gk};
+    const[nf,ng,nfk,ngk]=[f,gv,fk,gk].map(norm);
+    m.keys=[nf+ng,ng+nf,nfk+ngk,ngk+nfk,nf,ng,nfk,ngk];ROSTER.push(m)});
+}
+syncMembers();
 function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
 function sim(x,k){
   if(x===k)return 1;
@@ -488,6 +513,30 @@ function photosUI(r,redraw){
   box.append(f,h("button",{onclick:()=>f.click()},"＋ 写真を追加"));
   return h("div",{},h("label",{},"写真（本編でタップすると拡大できます）"),box);
 }
+function memberUI(d,redraw){
+  const wrap=h("div",{});
+  wrap.append(h("label",{},"追加したメンバーは出席確認の名簿に加わります。追加後に「保存して公開」を押すと反映されます。"));
+  d.members.forEach((a,i)=>wrap.append(h("div",{class:"tools",style:"align-items:center;justify-content:space-between"},
+    h("span",{},a[3]+" "+a[4]+"（"+a[5]+" "+a[6]+"） ／ "+a[1]+(a[2]?" "+a[2]:"")),
+    h("button",{onclick:()=>{d.members.splice(i,1);redraw()}},"削除"))));
+  const v={f:"",gv:"",fk:"",gk:"",role:"",g:""};
+  const groups=[...new Set(ROSTER.map(m=>m.g))];v.g=groups[0]||"";
+  const sel=h("select",{style:"width:100%;font:inherit;padding:.45rem 0;border:0;border-bottom:1px solid var(--hair);background:none"},groups.map(g=>h("option",{value:g},g)),h("option",{value:"その他"},"その他"));
+  sel.onchange=()=>{v.g=sel.value};
+  const msg=h("span",{class:"st"});
+  const add=h("button",{},"＋ メンバーを追加");
+  add.onclick=()=>{
+    if(!v.f.trim()||!v.gv.trim()){msg.textContent="姓と名を入力してください。";return}
+    d.members.push(["x"+Date.now().toString(36)+Math.random().toString(36).slice(2,4),v.g,v.role.trim(),v.f.trim(),v.gv.trim(),v.fk.trim(),v.gk.trim()]);
+    redraw();
+  };
+  wrap.append(
+    h("div",{class:"two"},field("姓（漢字）","",x=>v.f=x),field("名（漢字）","",x=>v.gv=x)),
+    h("div",{class:"two"},field("せい（ひらがな）","",x=>v.fk=x),field("めい（ひらがな）","",x=>v.gk=x)),
+    h("div",{class:"two"},h("div",{},h("label",{},"班"),sel),field("役職（任意）","",x=>v.role=x)),
+    h("div",{class:"tools",style:"align-items:center"},add,msg));
+  return wrap;
+}
 function galleryUI(d,redraw){
   const box=h("div",{class:"tools",style:"flex-wrap:wrap;align-items:center"});
   d.photos.forEach((s,k)=>box.append(h("div",{style:"position:relative"},h("img",{src:s,style:"height:4.5rem;display:block;border:1px solid #ddd"}),h("button",{style:"position:absolute;top:2px;right:2px;padding:0 .4rem",onclick:()=>{d.photos.splice(k,1);redraw()}},"×"))));
@@ -499,7 +548,7 @@ function galleryUI(d,redraw){
 async function setupEditor(art){
   const btn=h("button",{id:"edbtn"},"編集");document.body.append(btn);
   btn.onclick=()=>{
-    let d=JSON.parse(JSON.stringify(cfg));if(typeof d.mega!=="string")d.mega="Wrap Party";d.photos=d.photos||[];
+    let d=JSON.parse(JSON.stringify(cfg));if(typeof d.mega!=="string")d.mega="Wrap Party";d.photos=d.photos||[];d.members=d.members||[];
     const ov=h("div",{id:"ed"});document.body.append(ov);
     const att={};let ents=[],dbr=null,box=null,note="読み込み中…";const unsubs=[];
     function renderAtt(){
@@ -532,6 +581,7 @@ async function setupEditor(art){
         });
       }
     }
+    onRoster=()=>renderAtt();unsubs.push(()=>{onRoster=null});
     (async()=>{
       try{
         dbr=await getDb();
@@ -548,6 +598,7 @@ async function setupEditor(art){
       w.append(h("h3",{},"内容を編集"));
       w.append(h("h4",{},"出席確認"));
       box=h("div",{});w.append(box);renderAtt();
+      w.append(h("h4",{},"メンバーの追加"));w.append(memberUI(d,draw));
       w.append(h("h4",{},"トップの文字（円の中）"));w.append(field("表示する文字（短めがおすすめ）",d.mega,v=>d.mega=v));
       w.append(h("h4",{},"日時"));
       w.append(h("div",{class:"two"},field("開始（日付と時刻）",d.date,v=>d.date=v,{type:"datetime-local"}),field("終了時刻",d.end,v=>d.end=v,{type:"time"})));
@@ -570,11 +621,11 @@ async function setupEditor(art){
       save.onclick=async()=>{
         if(!/^\d+-\d+-\d+T\d+:\d+$/.test(d.date)){st.textContent="開始の日付と時刻を入力してください。";return}
         save.disabled=true;st.textContent="保存しています…";
-        try{await art.publish(build(d));if(art.local)location.reload()}
+        try{await art.publish(build(d));if(art.local){st.textContent="公開しました。";save.disabled=false}}
         catch(e){save.disabled=false;st.textContent=e&&(e.code==="not_writer"||e.code==="not_granted")?"この画面からは保存できません（編集権限がありません）。":e&&e.code==="conflict"?"他の更新と重なりました。ページが最新に切り替わります。":"保存できませんでした。時間をおいてもう一度お試しください。"}
       };
       w.append(h("div",{class:"bar"},save,h("button",{onclick:()=>{unsubs.forEach(u=>{try{u()}catch(e){}});ov.remove()}},"閉じる"),st));
-      ov.append(w);
+      ov.append(w);renderAtt();
     }
     draw();
   };
