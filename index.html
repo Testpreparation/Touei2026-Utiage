@@ -237,7 +237,20 @@ footer::before{content:"";display:block;width:1px;height:56px;background:var(--i
 </template><script type="application/json" id="cfg">{"date":"2026-12-03T17:00","end":"18:10","info":[["場所","アネックス"]],"timeline":[["17:00","開会","集まった人から席へ。",[]],["17:05","桐榮祭の振り返り","準備から当日までを、みんなで振り返ります。",[]],["17:15","ムービー上映","当日の写真と映像をまとめたムービーを上映します。",[]],["17:25","ビンゴ大会","景品あり。リーチになったら声を出してね。",[]],["17:50","花火","最後は花火で締めくくります。",[]],["18:10","閉会","おつかれさまでした。気をつけて帰ろう。",[]]],"mega":"Wrap Party","photos":[]}</script><script id="app">
 const $=id=>document.getElementById(id);
 document.body.append($("tpl").content.cloneNode(true));
-const cfg=JSON.parse($("cfg").textContent);
+const FB_URL="https://touei-2026-utiage-website-default-rtdb.firebaseio.com/";
+let cfg=JSON.parse($("cfg").textContent);
+(async()=>{
+/* 通常のWebサイトでは、Firebaseに「公開」された設定があればそれを使う */
+if(!window.claude&&FB_URL){let cfgAt=0,known=false;try{
+  const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),2500);
+  const r=await fetch(FB_URL.replace(/\/+$/,"")+"/config.json",{signal:ac.signal});clearTimeout(tm);
+  const v=r.ok?await r.json():null;
+  known=r.ok;cfgAt=(v&&v.at)||0;
+  if(v&&v.json){const c=JSON.parse(v.json);if(c&&c.date&&Array.isArray(c.timeline))cfg=c}
+}catch(e){}
+/* 他の端末で「保存して公開」されたら、開いている画面も自動で更新する */
+try{const es=new EventSource(FB_URL.replace(/\/+$/,"")+"/config.json");
+  es.addEventListener("put",e=>{try{const m=JSON.parse(e.data);if(m.path!=="/")return;const at=(m.data&&m.data.at)||0;if(at===cfgAt)return;if(known)location.reload();else{cfgAt=at;known=true}}catch(x){}})}catch(e){}}
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const p2=n=>String(n).padStart(2,"0");
@@ -396,7 +409,6 @@ function localDb(){
   };
 }
 /* 通常のWebサイトでは Firebase Realtime Database（REST）に保存 → 全端末にリアルタイム共有 */
-const FB_URL="https://touei-2026-utiage-website-default-rtdb.firebaseio.com/";
 let FBDB=null;
 function fbDb(base){
   base=base.replace(/\/+$/,"");
@@ -554,11 +566,11 @@ async function setupEditor(art){
           h("button",{onclick:()=>{d.timeline.splice(i,1);draw()}},"削除")))));
       w.append(h("div",{class:"tools"},h("button",{onclick:()=>{d.timeline.push(["","",""]);draw()}},"＋ 予定を追加")));
       w.append(h("h4",{},"写真（軽食）"));w.append(galleryUI(d,draw));
-      const save=h("button",{class:"pri"},art.local?"ファイルとして保存":"保存して公開");
+      const save=h("button",{class:"pri"},"保存して公開");
       save.onclick=async()=>{
         if(!/^\d+-\d+-\d+T\d+:\d+$/.test(d.date)){st.textContent="開始の日付と時刻を入力してください。";return}
         save.disabled=true;st.textContent="保存しています…";
-        try{await art.publish(build(d));if(art.local){st.textContent="index.html をダウンロードしました。サーバー上のファイルと入れ替えてください。";save.disabled=false}}
+        try{await art.publish(build(d));if(art.local)location.reload()}
         catch(e){save.disabled=false;st.textContent=e&&(e.code==="not_writer"||e.code==="not_granted")?"この画面からは保存できません（編集権限がありません）。":e&&e.code==="conflict"?"他の更新と重なりました。ページが最新に切り替わります。":"保存できませんでした。時間をおいてもう一度お試しください。"}
       };
       w.append(h("div",{class:"bar"},save,h("button",{onclick:()=>{unsubs.forEach(u=>{try{u()}catch(e){}});ov.remove()}},"閉じる"),st));
@@ -574,7 +586,9 @@ async function setupEditor(art){
       const open=()=>{try{if(location.hash==="#edit")localStorage.setItem(K,"1");else if(location.hash==="#noedit"){localStorage.removeItem(K);const eb=document.getElementById("edbtn");if(eb)eb.remove()}}catch(e){}
         let ok=false;try{ok=localStorage.getItem(K)==="1"}catch(e){}
         if(ok&&!document.getElementById("edbtn"))setupEditor({local:true,publish:async html=>{
-        const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([html],{type:"text/html"}));a.download="index.html";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1e4)}})};
+        const j=html.match(/id="cfg">([\s\S]*?)<\/script>/)[1];
+        const r=await fetch(FB_URL.replace(/\/+$/,"")+"/config.json",{method:"PUT",body:JSON.stringify({json:j,at:Date.now()})});
+        if(!r.ok)throw new Error("fb "+r.status)}})};
       open();addEventListener("hashchange",open);return;
     }
     const user=await claude.use("user");
@@ -582,5 +596,6 @@ async function setupEditor(art){
     const art=await claude.use("artifact");
     if(art)setupEditor(art);
   }catch(e){}
+})();
 })();
 </script></body></html>
