@@ -565,10 +565,10 @@ function show(x,y,k=5){for(let i=0;i<k;i++)setTimeout(()=>spark(x+(Math.random()
 })();
 
 /* ===== 出席確認：名簿（2026年度 桐榮祭実行委員会名簿・計27名）と照合エンジン ===== */
-/* 名簿は暗号化して保存（パスコードを入れた受付の端末だけが解除できる） */
+/* 名簿は暗号化してHTMLに保存（ソースを見ても名前は読めない。ページが自動で解除して照合に使う） */
 const ROSTER=[];let BASE=[],MEMS=[],CK=null;
-const KSALT="uM2djZxxXh+0w9tgV6uqpg==";
-const ROSTER_ENC="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";
+const RKEY="MC150C3/ls4FzrpaQ0qyKmgwxcSsYco0EsHv+7NSz1g=";
+const ROSTER_ENC="h4+MvCh56zVwTLZrjfqfUrniMpj02iFsoHJwIqyzanhyHWYolMgkhfPnq74i4BRCKW3hY30aErhnq7RL4+q2m4EV3jED/cVZD30DTDKu4dF1CTlZ2naNr0M1p0vnzu6yPZ/lHEoYAVscG2G9FSgeZaqiAAKs9+fzLOFCOUk7T6DWZrW18F9Es0aDZmsIKFaWQ5QDSuR1NW25KYDp7+h5lz+MFLrZIh/Nt73o7gGi1226IYRUBGaF47RmeiT8s7jdpZ/qjcb9U+Rno8cYBLQ+cZT/SQuSY9BSSNDKrsFkouQ9FmA5/eqpddKCa7gkhC25qZAEq68vng5BF4SoN0bNsDvwJAWWzFy9zS4A8Bqxfkvb4N73AGPquxgLVXXDfmwfxbwWTKPfVBOhLYr2ut3QHVl73oqeZ46ia3Cl0UyvZznqGvJ/DYkELfbUVedz8M+h5R2cwAACSnbxNh4jmTXsZPi/3JH77QfqLmpZODacxxPVP8aVaoRET5CjLj4MUqQj4fMQGfzn6DFrJme0Kt83LoOjQa1/pM4oLim1fsSp7YHyO5hZoCzvzfJobR+Vup/B9TMiqcYxN1UKj8p6AnId9WzmpLkgsiV+Y1FTR8uo8cEZKiRQS5mqfG7WEcgUKHBmNpnDgla8gyUJ3q3CFjJT9rQwbjDy4dTAX2897zoY12/tLaWFhsvmoP/oa6t2ezmLP5iFvG7rD/2fYKh0snPwzkcpb/Oik1blvmMKMZnX7qMekdqFp3uftlypdBxLE6SOSXEhHBCeC/nPMxBcRRMrx2J8NyYApgs2QaP8DJWgE433GRat301K7bllcjK6GpkwjPGSWXStDjDz6AjD9T6srX+FyyDGcsSUmeJTfR765LsH4Qzhnl/f34Xc84AHM5NbPsLDkRohaXtMtxw6AxQwdg3cLQwWuZUAX1KLdY07UOHV11apuUSov537QFolqr5CTpdRx4T14XVKY3NXSHCpHOqddrzZvZNJPyIKkqW73BcLTh7S7GrPG2KF26JMMixQKiMBVFPGmIAQrlzwns0ZRwkKQW2Ei2D9jK0Le9KaI6xWQMAmATqm3w46du0CgKzXI0164XWHjjZMxSB35sISkWafP6y4Myxo8HKSYiZ/Gqt8r4/jIFW5gLrFWxPl5dKVu0lQe78vcyVUwzJbudvGri3hPYIc8UmequoEu2EkodL9epkv/Oyk5nVV7X+7mOmsQDP8R68zlWplq2KK0kG2tr2eu+JEjee2tedu0UjtEX3WPaEx/BoCmwJmWuthy+1aYriRYTUiSKjDGp/nMvr3sJcagFKdv8o4w6AT6XTqhJ4FdmHpH0TK+IySSGJmBT9xJXd89qepyzLwoMfYYqDIgZ0gKpEK1xyDbz4lJnRM+1skPywHQzbC/54B5Wv0o3kFuMrBJBk1tdMv5nCCSzn0xj4+Eps+ECTJG6AUsxiEs9O2fqsjmkuYEI+b9LdwX2YqxYybE60+/2WtPvdt/oJGld9r2QoyvzkjRMigd0Fk8qYr4Y5eajCMFswmXIlqtDMnZvZjmcqN2QSQTDMhOpRBjvxtkd17HxSeNk6vwG7TBftHLxfYAxaSXIb7EFLAG6xOhBIJOuoKc59tK/YxxaAUnRwD+aOJZNw/0OjxskIRSahVFgsSvMpOkDd2Wypep+USGH2ebpCefDdOrBBJioCusFaKdbD531uaOjEMo7/ZhEXoDwWQXrpas1hb4z42omUZoY0/cdhioK5Fi0dVj7Pvarfnsd+zXi3EVR2PHeoicJ0jcmGj9MrsoHs1Lt/7kuiYxGHstlmXiU9/VfpP5yCCRviMTxZMKUN8T4bHPBZKhCIITUOsL3QeJ6LiOPQ1EPkPN/UFfK2khP7/U4DEbpcdX1Ipx05jj6RCm7I1ZUAHpJQ42dxh5d2WluNclL2G/o0mAQzT8kOlO/4cRIm68dyRD2Pe5ZewzzCsTSN2n14jYIV8lODpEG9DjvWGD3d/0J/utB52nDc4LS63M2Jg2PnlDiyznfRKJOwXrHEvi9bxcMWDvfiuAvWkQXaovegXU7W4DNnfA98mJ+9lCgP4KOy8I2tZ6Kf9xEWpCcbSgHja80FhjgNOQtDTtbrj/7rYpj70/EEjUpD+3EbalvaBAOgRxVGfJ5CeeZNdH+zH6CGIH63vzpKpKIRPpa1gJeLLVAJ2PXGaAfWYK5zEPHHGHl5TmZrnHu9ftHQsZLcwFp0Cip/M2tKheBVLTshTfggTY8E2t1LIMf4W757HIxKRz/xfzgjIlNcCJb+wdzfL5FsPUy3x6qjD41+zi8R0mubRSxoye/jEYP8kTvX7BsO/QbsKgD7kqb5VXtghyYHoPUwQeV2cN4zXdUqEmQ+uQpkrFvrKHa4UmLY2M562CaaDn5kn8PLTfvKOR2FiUXP0WycrLQu/943yJFMaPcYrNND4uOEoIf/Wn7lGirSji5RTxneDlRQUZj+nycV2E8u13QEqaJ7VI0ODsDuRPekJiGTEEVgFpJ3+DTAh3JQKh92SRNvBzJ3Xosk+AHKyiAbdvQF+clxnCa9Vp5EBxowS9/ju7JdSCT825YsnaFVYmfO2nOVvcZqGx+T9DTD/2rGV+s+4yWLWwlVINsK6mCY/rfMrtiQEqHxmPEOmWQQTptVCJZeQ6SxAZ9e1I4LhkSQdQOE2/El6v74R21BwidA1rA==";
 const VARI={"邉":"辺","邊":"辺","髙":"高","澤":"沢","條":"条","榮":"栄","齋":"斉","齊":"斉","德":"徳","國":"国","濱":"浜","嶋":"島"};
 const norm=s=>String(s).normalize("NFKC").normalize("NFD").replace(/[\u3099\u309a]/g,"").normalize("NFC").toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96)).replace(/[^\u3041-\u309f\u30fca-z0-9\u3400-\u9fff]/g,"").replace(/[邉邊髙澤條榮齋齊德國濱嶋]/g,c=>VARI[c]);
 const HON=/(さん|くん|ちゃん|様|さま|氏|君|先輩|せんぱい)$/;
@@ -580,37 +580,21 @@ function syncMembers(){
     const[nf,ng,nfk,ngk]=[f,gv,fk,gk].map(norm);
     m.keys=[nf+ng,ng+nf,nfk+ngk,ngk+nfk,nf,ng,nfk,ngk];ROSTER.push(m)});
 }
-/* ---- 暗号（AES-GCM／鍵はパスコードから PBKDF2 で作成）---- */
+/* ---- 暗号（AES-GCM）：ページが自動で解除する ---- */
 const unb64=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0)),b64=u=>btoa(String.fromCharCode(...u));
 async function decB(k,blob){const u=unb64(blob);return new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(0,12)},k,u.slice(12)))}
 async function encB(k,text){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(text)));const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return b64(o)}
-async function unlock(pass){
-  pass=String(pass).replace(/[\s-]/g,"").toUpperCase();
-  const km=await crypto.subtle.importKey("raw",new TextEncoder().encode(pass),"PBKDF2",false,["deriveKey"]);
-  const k=await crypto.subtle.deriveKey({name:"PBKDF2",salt:unb64(KSALT),iterations:600000,hash:"SHA-256"},km,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
-  const rows=JSON.parse(await decB(k,ROSTER_ENC));            /* パスコードが違うとここで失敗する */
-  const mem=cfg.membersEnc?JSON.parse(await decB(k,cfg.membersEnc)):[];
-  CK=k;BASE=rows;MEMS=mem;syncMembers();
-  try{sessionStorage.setItem("kiri_pass",pass)}catch(e){}
-  startProcessor();
+async function initRoster(){
+  try{
+    CK=await crypto.subtle.importKey("raw",unb64(RKEY),"AES-GCM",false,["encrypt","decrypt"]);
+    BASE=JSON.parse(await decB(CK,ROSTER_ENC));
+    MEMS=cfg.membersEnc?JSON.parse(await decB(CK,cfg.membersEnc)):[];
+    syncMembers();if(onRoster)onRoster();
+  }catch(e){}
 }
 async function reloadMembers(){if(!CK)return;try{MEMS=cfg.membersEnc?JSON.parse(await decB(CK,cfg.membersEnc)):[]}catch(e){}syncMembers();if(onRoster)onRoster()}
-/* 受付の端末：参加者の入力（checkins）を名簿と照合して、出席／一致しなかった入力に振り分ける */
-let procOff=null;const seen=new Set();
-async function startProcessor(){
-  if(procOff||!CK)return;
-  const db=await getDb();if(!db||!db.collection)return;
-  procOff=db.collection("checkins").onSnapshot(sn=>{sn.docs.forEach(async d=>{
-    const v=d.data()||{};if(!v.name||seen.has(d.id))return;seen.add(d.id);
-    try{
-      const r=matchMember(v.name),at=v.at||Date.now();
-      if(r.m)await db.doc("attendance/"+r.m.id).set({name:v.name,at,auto:true});
-      else await db.collection("entries").add({name:v.name,at,cands:r.cands});
-      await db.doc("checkins/"+d.id).delete();
-    }catch(e){seen.delete(d.id)}
-  })},()=>{});
-}
 syncMembers();
+const ROSTER_READY=initRoster();
 function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
 function sim(x,k){
   if(x===k)return 1;
@@ -687,7 +671,10 @@ async function getDb(){
 async function record(nm){
   try{
     const db=await getDb();
-    await db.collection("checkins").add({name:nm.slice(0,40),at:Date.now()});
+    await ROSTER_READY;
+    const r=matchMember(nm);
+    if(r.m)await db.doc("attendance/"+r.m.id).set({name:nm,at:Date.now(),auto:true});
+    else await db.collection("entries").add({name:nm,at:Date.now(),cands:r.cands});
   }catch(e){}
 }
 $("name").addEventListener("input",()=>{$("nerr").textContent=""});
@@ -708,8 +695,6 @@ $("join").onclick=e=>{
   },reduce?0:1300);
 };
 
-/* 受付の端末：同じタブなら、再読み込みしてもパスコードを覚えている */
-try{const pw0=sessionStorage.getItem("kiri_pass");if(pw0)unlock(pw0).catch(()=>sessionStorage.removeItem("kiri_pass"))}catch(e){}
 /* 参加済みの端末：ゲートを出さず、そのまま本編へ */
 if(joined){
   $("hi").textContent=`ようこそ、${joined.name}さん`;
@@ -735,17 +720,9 @@ function photosUI(r,redraw){
   box.append(f,h("button",{onclick:()=>f.click()},"＋ 写真を追加"));
   return h("div",{},h("label",{},"写真（本編でタップすると拡大できます）"),box);
 }
-function lockForm(done){
-  const inp=h("input",{type:"password",placeholder:"パスコード（例：XXXX-XXXX-XXXX）",autocomplete:"off"}),msg=h("span",{class:"st"}),btn=h("button",{class:"pri"},"名簿を解除");
-  const go=async()=>{msg.textContent="確認しています…";btn.disabled=true;
-    try{await unlock(inp.value);done()}catch(e){msg.textContent="パスコードが違います。";btn.disabled=false}};
-  btn.onclick=go;inp.onkeydown=e=>{if(e.key==="Enter")go()};
-  return h("div",{},h("label",{},"名簿は暗号化されています。パスコードを入力すると、出席確認とメンバー追加が使えます。"),inp,h("div",{class:"tools",style:"align-items:center"},btn,msg));
-}
 async function outCfg(d){const o=Object.assign({},d);if(CK)o.membersEnc=await encB(CK,JSON.stringify(d.members||[]));delete o.members;return o}
 function memberUI(d,redraw){
   const wrap=h("div",{});
-  if(!CK){wrap.append(h("label",{},"名簿を解除すると（出席確認の欄でパスコードを入力）、メンバーを追加できます。"));return wrap}
   wrap.append(h("label",{},"追加したメンバーは出席確認の名簿に加わります。追加後に「保存して公開」を押すと反映されます。"));
   d.members.forEach((a,i)=>wrap.append(h("div",{class:"tools",style:"align-items:center;justify-content:space-between"},
     h("span",{},a[3]+" "+a[4]+"（"+a[5]+" "+a[6]+"） ／ "+a[1]+(a[2]?" "+a[2]:"")),
@@ -810,7 +787,6 @@ async function setupEditor(art){
     function renderAtt(){
       if(!box||!box.isConnected)return;
       box.innerHTML="";
-      if(!CK){box.append(lockForm(()=>{d.members=JSON.parse(JSON.stringify(MEMS));draw()}));return}
       const n=ROSTER.filter(m=>att[m.id]).length;
       box.append(h("div",{class:"attn"},h("b",{},String(n)),` / ${ROSTER.length}名 出席`));
       if(note)box.append(h("div",{class:"attm"},note));
