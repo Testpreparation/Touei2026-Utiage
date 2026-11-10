@@ -567,8 +567,8 @@ function show(x,y,k=5){for(let i=0;i<k;i++)setTimeout(()=>spark(x+(Math.random()
 /* ===== 出席確認：名簿（2026年度 桐榮祭実行委員会名簿・計27名）と照合エンジン ===== */
 /* 名簿は暗号化してHTMLに保存（ソースを見ても名前は読めない。ページが自動で解除して照合に使う） */
 const ROSTER=[];let BASE=[],MEMS=[],CK=null;
-const RKEY="MC150C3/ls4FzrpaQ0qyKmgwxcSsYco0EsHv+7NSz1g=";
-const ROSTER_ENC="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";
+const RKEY="SvfotcZFKXHdq1/LFI9VSiAP8D83tbGqPMkxduqU3w8=";
+const ROSTER_ENC="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";
 const VARI={"邉":"辺","邊":"辺","髙":"高","澤":"沢","條":"条","榮":"栄","齋":"斉","齊":"斉","德":"徳","國":"国","濱":"浜","嶋":"島"};
 const norm=s=>String(s).normalize("NFKC").normalize("NFD").replace(/[\u3099\u309a]/g,"").normalize("NFC").toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-96)).replace(/[^\u3041-\u309f\u30fca-z0-9\u3400-\u9fff]/g,"").replace(/[邉邊髙澤條榮齋齊德國濱嶋]/g,c=>VARI[c]);
 const HON=/(さん|くん|ちゃん|様|さま|氏|君|先輩|せんぱい)$/;
@@ -580,19 +580,40 @@ function syncMembers(){
     const[nf,ng,nfk,ngk]=[f,gv,fk,gk].map(norm);
     m.keys=[nf+ng,ng+nf,nfk+ngk,ngk+nfk,nf,ng,nfk,ngk];ROSTER.push(m)});
 }
-/* ---- 暗号（AES-GCM）：ページが自動で解除する ---- */
+/* ---- 暗号（ChaCha20・ブラウザの標準機能に依存しないので、どの環境でも自動で解除できる）---- */
 const unb64=t=>Uint8Array.from(atob(t),c=>c.charCodeAt(0)),b64=u=>btoa(String.fromCharCode(...u));
-async function decB(k,blob){const u=unb64(blob);return new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM",iv:u.slice(0,12)},k,u.slice(12)))}
-async function encB(k,text){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:"AES-GCM",iv},k,new TextEncoder().encode(text)));const o=new Uint8Array(12+ct.length);o.set(iv);o.set(ct,12);return b64(o)}
+function chacha20(key,nonce,data){
+  const K=new DataView(key.buffer,key.byteOffset,32),N=new DataView(nonce.buffer,nonce.byteOffset,12),out=new Uint8Array(data.length);
+  const s=new Uint32Array(16),x=new Uint32Array(16);
+  s[0]=0x61707865;s[1]=0x3320646e;s[2]=0x79622d32;s[3]=0x6b206574;
+  for(let i=0;i<8;i++)s[4+i]=K.getUint32(i*4,true);
+  for(let i=0;i<3;i++)s[13+i]=N.getUint32(i*4,true);
+  const qr=(a,b,c,d)=>{
+    x[a]=(x[a]+x[b])>>>0;x[d]^=x[a];x[d]=(x[d]<<16|x[d]>>>16)>>>0;
+    x[c]=(x[c]+x[d])>>>0;x[b]^=x[c];x[b]=(x[b]<<12|x[b]>>>20)>>>0;
+    x[a]=(x[a]+x[b])>>>0;x[d]^=x[a];x[d]=(x[d]<<8|x[d]>>>24)>>>0;
+    x[c]=(x[c]+x[d])>>>0;x[b]^=x[c];x[b]=(x[b]<<7|x[b]>>>25)>>>0};
+  for(let off=0;off<data.length;off+=64){
+    x.set(s);
+    for(let r=0;r<10;r++){qr(0,4,8,12);qr(1,5,9,13);qr(2,6,10,14);qr(3,7,11,15);qr(0,5,10,15);qr(1,6,11,12);qr(2,7,8,13);qr(3,4,9,14)}
+    for(let i=0;i<16;i++)x[i]=(x[i]+s[i])>>>0;
+    const kb=new Uint8Array(x.buffer);
+    for(let i=0;i<64&&off+i<data.length;i++)out[off+i]=data[off+i]^kb[i];
+    s[12]=(s[12]+1)>>>0;
+  }
+  return out;
+}
+async function decB(_,blob){const u=unb64(blob);return new TextDecoder().decode(chacha20(unb64(RKEY),u.slice(0,12),u.slice(12)))}
+async function encB(_,text){const n=new Uint8Array(12);(window.crypto&&crypto.getRandomValues)?crypto.getRandomValues(n):n.forEach((_,i)=>n[i]=Math.random()*256);
+  const ct=chacha20(unb64(RKEY),n,new TextEncoder().encode(text)),o=new Uint8Array(12+ct.length);o.set(n);o.set(ct,12);return b64(o)}
 async function initRoster(){
   try{
-    CK=await crypto.subtle.importKey("raw",unb64(RKEY),"AES-GCM",false,["encrypt","decrypt"]);
-    BASE=JSON.parse(await decB(CK,ROSTER_ENC));
-    MEMS=cfg.membersEnc?JSON.parse(await decB(CK,cfg.membersEnc)):[];
+    BASE=JSON.parse(await decB(0,ROSTER_ENC));CK=1;
+    try{MEMS=cfg.membersEnc?JSON.parse(await decB(0,cfg.membersEnc)):[]}catch(e){MEMS=[]}
     syncMembers();if(onRoster)onRoster();
   }catch(e){}
 }
-async function reloadMembers(){if(!CK)return;try{MEMS=cfg.membersEnc?JSON.parse(await decB(CK,cfg.membersEnc)):[]}catch(e){}syncMembers();if(onRoster)onRoster()}
+async function reloadMembers(){if(!CK)return;try{MEMS=cfg.membersEnc?JSON.parse(await decB(0,cfg.membersEnc)):[]}catch(e){MEMS=[]}syncMembers();if(onRoster)onRoster()}
 syncMembers();
 const ROSTER_READY=initRoster();
 function lev(a,b){const d=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=d[0];d[0]=i;for(let j=1;j<=b.length;j++){const t=d[j];d[j]=Math.min(d[j]+1,d[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return d[b.length]}
